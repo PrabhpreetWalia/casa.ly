@@ -1,0 +1,69 @@
+.hero {
+  min-height: 80vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.hero h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: slategray;
+}
+
+.hero form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.hero form input {
+  width: clamp(300px, 80vw, 25rem);
+  min-height: 2rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 1.3rem;
+  color: slategray;
+  border-radius: 10px;
+  border: none;
+}
+
+.hero form input[type="submit"] {
+  background: slategray;
+  color: white;
+  cursor: pointer;
+}
+
+.hero form input[type="submit"]:hover{
+  background: var(--primary-color);
+}
+
+.hero form input:focus {
+  outline: none;
+}
+
+.hero form input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: slategray !important;
+}
+
+.hero form input[type='number']::-webkit-outer-spin-button,
+.hero form input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.hero h5{
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: rgb(54, 54, 54);
+}
+
+.hero h5 a{
+  color: var(--primary-color);
+  text-decoration: none;
+}

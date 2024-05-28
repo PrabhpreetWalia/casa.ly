@@ -1,11 +1,9 @@
-import React from 'react'
+import React from "react";
 
 function SignIn() {
-  return (
-    <div>
-      Sign In
-    </div>
+  return(
+    <div className="h5">hfje</div>
   )
 }
 
-export default SignIn
+export default SignIn;
