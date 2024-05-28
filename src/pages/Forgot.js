@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-function SignIn() {
-  const navigate = useNavigate()
+function Forgot() {
+  const navigate = useNavigate();
   const [buttonValue, setButtonValue] = useState("Get OTP");
   const [showOTP, setShowOTP] = useState(false);
   const [OTP, setOTP] = useState("");
   const [isLoading, setLoading] = useState(false);
-  const [countdown, setcountdown] = useState(0)
-  const countdownRef = useRef(null)
+  const [countdown, setcountdown] = useState(0);
+  const countdownRef = useRef(null);
 
   const [formData, setFormData] = useState({
     username: "",
-    password: "",
+    password: ""
   });
 
   function handleFormData(e) {
@@ -24,7 +24,7 @@ function SignIn() {
   function handleGetOTP(e) {
     e.preventDefault();
     setLoading(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/sign-in`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/resend-otp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,39 +33,14 @@ function SignIn() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.success !== true) {
-          if(data.OTPRequired){
-            setShowOTP(true);
-            setButtonValue("Resend");
-            setcountdown(15)
+        if (data.success === true) {
+          setShowOTP(true);
+          setButtonValue("Resend");
+          setcountdown(15);
 
-            setLoading(true);
-      fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/resend-otp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username: formData.username }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            console.log("OTP resent");
-            setcountdown(15)
-          } else {
-            console.log(data.message);
-          }
-        })
-        .catch((e) => console.log(e))
-        .finally(() => setLoading(false));
-
-            
-          }
-
-          console.log(data.message)
-
+          console.log(data.message);
         } else {
-          console.log("Logged In")
+          console.log(data.message);
         }
       })
       .catch((e) => console.log(e))
@@ -76,20 +51,22 @@ function SignIn() {
     if (OTP !== "") {
       setButtonValue("Verify");
     } else {
-      const resendText = countdown <= 0? "Resend": `Resend (${countdown}s)`
+      const resendText = countdown <= 0 ? "Resend" : `Resend (${countdown}s)`;
       setButtonValue(resendText);
     }
   }, [OTP, countdown]);
 
-  useEffect(()=> {
-    if(countdown <= 0 ) return;
+  useEffect(() => {
+    if (countdown <= 0) return;
 
-    if(countdownRef.current) clearInterval(countdownRef.current)
+    if (countdownRef.current) clearInterval(countdownRef.current);
 
-    countdownRef.current = setInterval(()=>{setcountdown(prev => prev-1)},1000)
+    countdownRef.current = setInterval(() => {
+      setcountdown((prev) => prev - 1);
+    }, 1000);
 
-    return ()=> clearInterval(countdownRef.current)
-  }, [countdown])
+    return () => clearInterval(countdownRef.current);
+  }, [countdown]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -107,7 +84,7 @@ function SignIn() {
         .then((data) => {
           if (data.success) {
             console.log("OTP resent");
-            setcountdown(15)
+            setcountdown(15);
           } else {
             console.log(data.message);
           }
@@ -116,18 +93,18 @@ function SignIn() {
         .finally(() => setLoading(false));
     } else {
       setLoading(true);
-      fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/check-otp`, {
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/change-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username: formData.username, OTP: OTP }),
+        body: JSON.stringify({ username: formData.username, OTP: OTP , newPassword: formData.password}),
       })
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
-            console.log("Email verified. Now you can login");
-            setShowOTP(false)
+            console.log(data.message);
+            navigate('/sign-in')
           } else {
             console.log(data.message);
             setOTP("");
@@ -139,7 +116,7 @@ function SignIn() {
 
   return (
     <div className="hero">
-      <h2>Sign In</h2>
+      <h2>Forgot Password</h2>
       <form>
         <input
           type="text"
@@ -151,18 +128,20 @@ function SignIn() {
             handleFormData(e);
           }}
         />
-        <input
-          type="password"
-          placeholder="Password"
-          id="password"
-          required
-          value={formData["password"]}
-          onChange={(e) => {
-            handleFormData(e);
-          }}
-        />
+        
         {showOTP && (
           <>
+            <input
+              type="password"
+              placeholder="New password"
+              id="password"
+              required
+              value={formData["password"]}
+              onChange={(e) => {
+                handleFormData(e);
+              }}
+            />
+
             <input
               type="number"
               id="otp"
@@ -175,7 +154,7 @@ function SignIn() {
             <input
               type="submit"
               value={isLoading ? "Loading" : buttonValue}
-              disabled={OTP.length > 0? false: countdown>0? true: false}
+              disabled={OTP.length > 0 ? false : countdown > 0 ? true : false}
               onClick={(e) => handleSubmit(e)}
             />
           </>
@@ -184,16 +163,17 @@ function SignIn() {
         {!showOTP && (
           <input
             type="submit"
-            value={isLoading ? "Loading" : "Sign In"}
+            value={isLoading ? "Loading" : "Send OTP"}
             onClick={(e) => handleGetOTP(e)}
           />
         )}
 
-        <h5>Don't have an account <Link to="/sign-up">Sign up?</Link></h5>
-        <h5><Link to="/forgot-password">Forgot password?</Link></h5>
+        <h5>
+          Back to <Link to="/sign-in">Sign in?</Link>
+        </h5>
       </form>
     </div>
   );
 }
 
-export default SignIn;
+export default Forgot;

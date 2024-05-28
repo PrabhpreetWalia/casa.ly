@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {Link, useNavigate} from 'react-router-dom'
 import './Auth.css'
 
@@ -8,6 +8,8 @@ function SignUp() {
   const [showOTP, setShowOTP] = useState(false);
   const [OTP, setOTP] = useState("");
   const [isLoading, setLoading] = useState(false);
+  const [countdown, setcountdown] = useState(0)
+  const countdownRef = useRef(null)
 
   const [formData, setFormData] = useState({
     username: "",
@@ -24,7 +26,6 @@ function SignUp() {
   function handleGetOTP(e) {
     e.preventDefault();
     setLoading(true);
-    console.log(`${process.env.REACT_APP_BACKEND_URL}/auth/sign-up`);
     fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/sign-up`, {
       method: "POST",
       headers: {
@@ -39,6 +40,7 @@ function SignUp() {
         } else {
           setShowOTP(true);
           setButtonValue("Resend");
+          setcountdown(15)
         }
       })
       .catch((e) => console.log(e))
@@ -49,9 +51,20 @@ function SignUp() {
     if (OTP !== "") {
       setButtonValue("Verify");
     } else {
-      setButtonValue("Resend");
+      const resendText = countdown <= 0? "Resend": `Resend (${countdown}s)`
+      setButtonValue(resendText);
     }
-  }, [OTP]);
+  }, [OTP, countdown]);
+
+  useEffect(()=> {
+    if(countdown <= 0 ) return;
+
+    if(countdownRef.current) clearInterval(countdownRef.current)
+
+    countdownRef.current = setInterval(()=>{setcountdown(prev => prev-1)},1000)
+
+    return ()=> clearInterval(countdownRef.current)
+  }, [countdown])
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -69,6 +82,7 @@ function SignUp() {
         .then((data) => {
           if (data.success) {
             console.log("OTP resent");
+            setcountdown(15)
           } else {
             console.log(data.message);
           }
@@ -146,6 +160,7 @@ function SignUp() {
             <input
               type="submit"
               value={isLoading ? "Loading" : buttonValue}
+              disabled={OTP.length > 0? false: countdown>0? true: false}
               onClick={(e) => handleSubmit(e)}
             />
           </>

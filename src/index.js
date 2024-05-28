@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import {
@@ -11,6 +11,7 @@ import Profile from './pages/Profile'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import Layout from './Layout';
+import Forgot from './pages/Forgot';
 
 
 const router = createBrowserRouter([
@@ -35,10 +36,13 @@ const router = createBrowserRouter([
     element: <Layout><SignUp /></Layout>,
   },
   {
+    path: "/forgot-password",
+    element: <Layout><Forgot /></Layout>,
+  },
+  {
     path: "*",
     element: <div>Page not found</div>,
   },
-
 ]);
 
 
